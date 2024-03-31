@@ -27,8 +27,8 @@
 	//const dom = document.getElementsByClassName("box")[0];
 	const dom = document.getElementById("gameBody");
 	//dom.innerHTML = randomHtmlDom()+randomHtmlDom()+randomHtmlDom()
-	console.log(dom.innerHtml);
 	const game = []
+	let isClick = true;
 	var isPlay = false;
 	var time = 0;
 	var speed = 0;
@@ -103,6 +103,7 @@
 
 	function resetGame(){
 			reset();
+			isClick = true;
 			time = 0;
 			speed = 0;
 			times = 0;
@@ -125,39 +126,53 @@ function resetScore(){
 	paint();
 	
 	document.addEventListener('keydown',(e) => {
-		console.log(e)
+		// console.log(e)
 	    if(e.keyCode == 97 || e.keyCode == 49 || e.keyCode == 37){
-	        if(game[3] == 0){
-						if(!isPlay){
-							playGame();
-						}else{
-							times++;
-							resetScore();
-						}
-		   paint(true);
-		   dom.style.top = -200 + "px";
-		   game.unshift(Math.round(Math.random()*2));
-	           move();
-   		}else{
-				loser()
-   		}
+				isClick = false
+				judgeGame(0)
+
 	    }else if(e.keyCode == 98 || e.keyCode == 50 || e.keyCode == 40){
-	    	if(game[3] == 1){
-					if(!isPlay){
-							playGame();
-						}else{
-							times++;
-							resetScore();
-						}
-		   paint(true);
-		   dom.style.top = -200 + "px";
-		   game.unshift(Math.round(Math.random()*2));
-	           move();
-   		}else{
-				loser()
-   		}
+				isClick = false
+				judgeGame(1)
+
 	    }else if(e.keyCode == 99 || e.keyCode == 51 || e.keyCode == 39){
-	    	if(game[3] == 2){
+				isClick = false
+				 judgeGame(2)
+	    }
+	});
+
+
+	function loser(){
+		let msg = isClick ? "特殊成就，只用鼠标！" : "游戏结束！"
+		isPlay = false; 
+		stop();
+		alert(msg)
+	}
+	
+
+
+	let timer = null;
+
+
+
+	function move(){
+	  clearTimeout(timer);
+	  timer = setTimeout(()=>{
+		resetOnClick(2)
+	  dom.style.top = (parseInt(dom.style.top) + 8) <= 0 ? (parseInt(dom.style.top) + 8) : 0 + "px" ;
+		if(parseInt(dom.style.top) == 0){
+		    paint();
+		    dom.style.top = -200 + "px"
+		    //move();
+		}else{
+		    move();
+		}
+    },10)
+	}
+
+	
+	function judgeGame(mySelect){
+		  if(mySelect == game[3]){
 					if(!isPlay){
 							playGame();
 						}else{
@@ -171,57 +186,46 @@ function resetScore(){
    		}else{
 	           loser()
    		}
-	    }
-	});
-
-
-	function loser(){
-		isPlay = false;
-		stop();
-		alert("loser!")
-	}
-	
-
-
-	let timer = null;
-	function move(){
-	     clearTimeout(timer);
-	    timer = setTimeout(()=>{
-	    	dom.style.top = (parseInt(dom.style.top) + 8) <= 0 ? (parseInt(dom.style.top) + 8) : 0 + "px" ;
-		if(parseInt(dom.style.top) == 0){
-		    paint();
-		    dom.style.top = -200 + "px"
-		    //move();
-		}else{
-		    move();
-		}
-     	    },10)
 	}
 
 	function paint(select){
 	    dom.innerHTML = "";
-    	    game.forEach((e,index) => {
-		if(index == 3 && select){
-		    dom.innerHTML += selectHtmlDom(e);
-		}else{
-		    dom.innerHTML += randomHtmlDom(e);
-		}
-		
-	    })
-	    //console.log(game);
-	    //console.log(dom.innerHTML);
+			game.forEach((e,index) => {
+				if(index == 3 && select){
+						dom.innerHTML += selectHtmlDom(e);
+				}else{
+						dom.innerHTML += randomHtmlDom(e);
+				}
+			})
+			resetOnClick(3)
 	}
-    }
+
+	function resetOnClick(select){
+		let domList1 = document.getElementsByClassName('num1');
+		let domList2 = document.getElementsByClassName('num2');
+		let domList3 = document.getElementsByClassName('num3');
+		domList1[select].onclick = function(){
+			judgeGame(0)
+		}
+		domList2[select].onclick = function(){
+			judgeGame(1)
+		}
+		domList3[select].onclick = function(){
+			judgeGame(2)
+		}
+	}
+
+}
 
 	function  randomHtmlDom(index){
 	    let isBlack = (index == 0 || index) ? index : Math.round(Math.random()*2);
 	    // console.log(isBlack)
 	    if(isBlack == 0){
-		return "<tr><td class='active' /><td class='unactive' /><td class='unactive' /></tr>";
+		return "<tr><td  class='active num1' /><td class='unactive num2' /><td class='unactive num3' /></tr>";
 	    }else if(isBlack == 1){
-		return "<tr><td class='unactive' /><td class='active' /><td class='unactive' /></tr>";
+		return "<tr><td  class='unactive num1' /><td  class='active num2' /><td class='unactive num3' /></tr>";
 	    }else {
-		return "<tr><td class='unactive' /><td class='unactive' /><td class='active' /></tr>"	
+		return "<tr><td  class='unactive num1' /><td class='unactive num2' /><td class='active num3' /></tr>"	
 	    }
 	}
 	function  selectHtmlDom(index){
@@ -232,7 +236,7 @@ function resetScore(){
 	    }else if(isBlack == 1){
 		return "<tr><td class='unactive' /><td class='active select' /><td class='unactive' /></tr>";
 	    }else {
-		return "<tr><td class='unactive' /><td class='unactive' /><td class='active select' /></tr>"	
+		return "<tr><td class='unactive' /><td class='unactive' /><td class='active select' /></tr>"	;
 	    }
 	}
 
