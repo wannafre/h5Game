@@ -204,15 +204,23 @@ function resetScore(){
 		let domList1 = document.getElementsByClassName('num1');
 		let domList2 = document.getElementsByClassName('num2');
 		let domList3 = document.getElementsByClassName('num3');
-		domList1[select].onclick = function(){
+		function tab1(){
 			judgeGame(0)
 		}
-		domList2[select].onclick = function(){
+		function tab2(){
 			judgeGame(1)
 		}
-		domList3[select].onclick = function(){
+		function tab3(){
 			judgeGame(2)
 		}
+		domList1[select].onclick = tab1
+		domList2[select].onclick = tab2;
+		domList3[select].onclick = tab3;
+		domList1[select].addEventListener('touchstart',tab1);
+		domList2[select].addEventListener('touchstart',tab2);
+		domList3[select].addEventListener('touchstart',tab3);
+
+
 	}
 
 }
